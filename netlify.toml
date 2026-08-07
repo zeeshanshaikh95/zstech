@@ -1,0 +1,11 @@
+# ZS TECH — static site deployment for Netlify
+[build]
+  publish = "."
+  command = ""
+
+# Force HTTPS redirects (default) and sensible cache headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
