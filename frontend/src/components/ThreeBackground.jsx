@@ -128,12 +128,22 @@ export default function ThreeBackground() {
         return false;
       }
       renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-      // half-resolution render: a quarter of the fill-rate, upscaled to
-      // full size. A subtle blur masks the softness — the scene is made of
-      // soft wireframes/particles/glows so it reads as a deliberate look.
-      renderer.setPixelRatio(isLowEnd ? 0.6 : 0.85);
-      canvas.style.filter = `blur(${isLowEnd ? 3 : 1.6}px)`;
-      canvas.style.transform = 'scale(1.06)';
+      // Slightly under native resolution — visually identical for soft,
+      // low-opacity wireframes. No blur filter: a full-screen blur on a
+      // canvas that re-renders every frame costs more than it saves.
+      renderer.setPixelRatio(isLowEnd ? 0.75 : 0.9);
+      // Instant, non-blocking software-WebGL detection. A CPU-rendered 3D
+      // scene is far heavier than the 2D fallback, so bail out without
+      // rendering a single probe frame.
+      try {
+        const glctx = renderer.getContext();
+        const dbg = glctx && glctx.getExtension('WEBGL_debug_renderer_info');
+        const gpu = dbg ? String(glctx.getParameter(dbg.UNMASKED_RENDERER_WEBGL)) : '';
+        if (/swiftshader|llvmpipe|software|basic render/i.test(gpu)) {
+          renderer.dispose();
+          return false;
+        }
+      } catch (e) { /* detection unavailable — assume a real GPU */ }
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(55, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
@@ -265,27 +275,9 @@ export default function ThreeBackground() {
         renderer.dispose();
       };
 
-      // Reduced-motion users get a single static frame — no probing needed.
       if (reduced) {
         renderer.render(scene, camera);
         return cleanup;
-      }
-
-      // Probe the real per-frame render cost. Catches software-rendered
-      // WebGL (GPU acceleration off) and very weak GPUs. The first renders
-      // pay shader compilation, so warm up before timing to avoid a false
-      // "slow" reading on perfectly capable hardware.
-      for (let i = 0; i < 4; i += 1) renderer.render(scene, camera);
-      const t0 = performance.now();
-      for (let i = 0; i < 3; i += 1) renderer.render(scene, camera);
-      const frameMs = (performance.now() - t0) / 3;
-      if (frameMs > 60) {
-        cleanup();
-        return false; // hand off to the cheap 2D scene
-      }
-      if (frameMs > 22) {
-        renderer.setPixelRatio(isLowEnd ? 0.5 : 0.65);
-        canvas.style.filter = `blur(${isLowEnd ? 3.5 : 2.2}px)`;
       }
 
       animate();

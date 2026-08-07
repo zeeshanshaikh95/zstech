@@ -1570,10 +1570,17 @@ document.querySelectorAll('[data-copy]').forEach(el=>{
       renderer=new THREE.WebGLRenderer({canvas,antialias:!isLowEnd,alpha:true,powerPreference:'high-performance'});
     }catch(e){return false}
     renderer.setSize(canvas.clientWidth,canvas.clientHeight);
-    /* half-resolution render — quarter fill-rate, upscaled, subtle blur masks softness */
-    renderer.setPixelRatio(isLowEnd?0.6:0.85);
-    canvas.style.filter='blur('+(isLowEnd?3:1.6)+'px)';
-    canvas.style.transform='scale(1.06)';
+    /* slightly under native resolution — soft wireframes need no blur mask,
+       and a full-screen blur on a re-rendering canvas costs more than it saves */
+    renderer.setPixelRatio(isLowEnd?0.75:0.9);
+    /* instant software-WebGL detection — a CPU-rendered 3D scene is far
+       heavier than the 2D fallback, so bail out without any probe frames */
+    try{
+      const _ctx=renderer.getContext();
+      const _dbg=_ctx.getExtension('WEBGL_debug_renderer_info');
+      const _gpu=_dbg?String(_ctx.getParameter(_dbg.UNMASKED_RENDERER_WEBGL)):'';
+      if(/swiftshader|llvmpipe|software|basic render/i.test(_gpu)){renderer.dispose();renderer=null;return false}
+    }catch(e){}
 
     scene=new THREE.Scene();
     camera=new THREE.PerspectiveCamera(55,canvas.clientWidth/canvas.clientHeight,0.1,100);
@@ -1652,23 +1659,6 @@ document.querySelectorAll('[data-copy]').forEach(el=>{
     });
 
     if(reduced){renderer.render(scene,camera);return true}
-
-    /* probe real render cost — if WebGL is software-rendered or the GPU is
-       very weak, hand off to the cheap 2D scene before the user feels it.
-       Warm up first: the first renders pay shader compilation, so timing
-       them would falsely flag capable hardware as slow. */
-    for(let _i=0;_i<4;_i++)renderer.render(scene,camera);
-    const _t0=performance.now();
-    for(let _i=0;_i<3;_i++)renderer.render(scene,camera);
-    const _frameMs=(performance.now()-_t0)/3;
-    if(_frameMs>60){
-      renderer.dispose();renderer=null;return false;
-    }
-    if(_frameMs>22){
-      renderer.setPixelRatio(isLowEnd?0.5:0.65);
-      canvas.style.filter='blur('+(isLowEnd?3.5:2.2)+'px)';
-    }
-
     animate();
     return true;
   }
