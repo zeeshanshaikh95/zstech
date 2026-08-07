@@ -142,14 +142,14 @@ export default function ThreeBackground() {
       scene.add(group);
 
       const ico = new THREE.Mesh(
-        new THREE.IcosahedronGeometry(1.35, 1),
+        new THREE.IcosahedronGeometry(1.35, 0),
         new THREE.MeshBasicMaterial({ wireframe: true, color: 0x8b5cf6, transparent: true, opacity: 0.4 })
       );
       ico.position.set(-3.4, -1.2, -2);
       group.add(ico);
 
       const torus = new THREE.Mesh(
-        new THREE.TorusGeometry(1.05, 0.34, 14, 42),
+        new THREE.TorusGeometry(1.05, 0.34, 14, 32),
         new THREE.MeshBasicMaterial({ wireframe: true, color: 0x38bdf8, transparent: true, opacity: 0.32 })
       );
       torus.position.set(3.6, 1.4, -2.5);
@@ -163,7 +163,7 @@ export default function ThreeBackground() {
       group.add(octa);
 
       const ring = new THREE.Mesh(
-        new THREE.TorusGeometry(1.9, 0.05, 8, 60),
+        new THREE.TorusGeometry(1.9, 0.05, 8, 48),
         new THREE.MeshBasicMaterial({ color: 0x6366f1, transparent: true, opacity: 0.22 })
       );
       ring.position.set(-3.6, 1.5, -3.5);
@@ -195,7 +195,7 @@ export default function ThreeBackground() {
       );
       group.add(ribbon2);
 
-      const N = reduced ? 240 : isLowEnd ? 360 : 640;
+      const N = reduced ? 240 : isLowEnd ? 260 : 480;
       const pos = new Float32Array(N * 3);
       const col = new Float32Array(N * 3);
       const palette = [0x8b5cf6, 0xa855f7, 0x38bdf8, 0x6366f1];
@@ -258,18 +258,38 @@ export default function ThreeBackground() {
         });
       };
 
-      if (reduced) {
-        renderer.render(scene, camera);
-      } else {
-        animate();
-      }
-
-      return () => {
+      const cleanup = () => {
         window.removeEventListener('mousemove', onMouse);
         window.removeEventListener('resize', onResize);
         cancelAnimationFrame(raf);
         renderer.dispose();
       };
+
+      // Reduced-motion users get a single static frame — no probing needed.
+      if (reduced) {
+        renderer.render(scene, camera);
+        return cleanup;
+      }
+
+      // Probe the real per-frame render cost. Catches software-rendered
+      // WebGL (GPU acceleration off) and very weak GPUs. The first renders
+      // pay shader compilation, so warm up before timing to avoid a false
+      // "slow" reading on perfectly capable hardware.
+      for (let i = 0; i < 4; i += 1) renderer.render(scene, camera);
+      const t0 = performance.now();
+      for (let i = 0; i < 3; i += 1) renderer.render(scene, camera);
+      const frameMs = (performance.now() - t0) / 3;
+      if (frameMs > 60) {
+        cleanup();
+        return false; // hand off to the cheap 2D scene
+      }
+      if (frameMs > 22) {
+        renderer.setPixelRatio(isLowEnd ? 0.5 : 0.65);
+        canvas.style.filter = `blur(${isLowEnd ? 3.5 : 2.2}px)`;
+      }
+
+      animate();
+      return cleanup;
     };
 
     /* ---------- boot ---------- */
