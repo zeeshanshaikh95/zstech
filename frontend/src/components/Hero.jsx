@@ -1,7 +1,18 @@
-import { useEffect, useRef } from 'react';
-import ThreeBackground from './ThreeBackground.jsx';
+import { Component, lazy, Suspense, useEffect, useRef } from 'react';
 import { useTypewriter } from '../hooks/useTypewriter.js';
 import { useToast } from '../context/ToastContext.jsx';
+
+// Three.js (~600kB) loads in its own async chunk — the hero and the rest of
+// the page paint immediately, and the 3D scene mounts as soon as it arrives.
+const ThreeBackground = lazy(() => import('./ThreeBackground.jsx'));
+
+// If the chunk fails to load (offline/flaky network) the background quietly
+// stays off instead of taking the whole page down.
+class ThreeBoundary extends Component {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  render() { return this.state.failed ? null : this.props.children; }
+}
 
 function Mockups() {
   return (
@@ -96,7 +107,11 @@ export default function Hero({ words, contact }) {
       <div className="aurora aur-a" />
       <div className="aurora aur-b" />
       <div className="aurora aur-c" />
-      <ThreeBackground />
+      <Suspense fallback={null}>
+        <ThreeBoundary>
+          <ThreeBackground />
+        </ThreeBoundary>
+      </Suspense>
 
       <div className="wrap hero-inner">
         <div className="hero-copy" ref={copyRef}>

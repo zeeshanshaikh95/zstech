@@ -1560,6 +1560,8 @@ document.querySelectorAll('[data-copy]').forEach(el=>{
 (function(){
   const canvas=document.getElementById('threebg');
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isMobile=matchMedia('(hover:none),(pointer:coarse)').matches;
+  const isLowEnd=isMobile||(navigator.hardwareConcurrency||8)<=6;
   let renderer,scene,camera,group,ribbon,points,fib,frame=0,playing=true;
   let mouseX=0,mouseY=0,camX=0,camY=0;
 
@@ -1568,7 +1570,10 @@ document.querySelectorAll('[data-copy]').forEach(el=>{
       renderer=new THREE.WebGLRenderer({canvas,antialias:!isLowEnd,alpha:true,powerPreference:'high-performance'});
     }catch(e){return false}
     renderer.setSize(canvas.clientWidth,canvas.clientHeight);
-    renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.25));
+    /* half-resolution render — quarter fill-rate, upscaled, subtle blur masks softness */
+    renderer.setPixelRatio(isLowEnd?0.6:0.85);
+    canvas.style.filter='blur('+(isLowEnd?3:1.6)+'px)';
+    canvas.style.transform='scale(1.06)';
 
     scene=new THREE.Scene();
     camera=new THREE.PerspectiveCamera(55,canvas.clientWidth/canvas.clientHeight,0.1,100);
@@ -1613,8 +1618,6 @@ document.querySelectorAll('[data-copy]').forEach(el=>{
         Math.cos(t*Math.PI*2.2)*1.4-.5
       ));
     }
-    const isMobile=matchMedia('(hover:none),(pointer:coarse)').matches;
-    const isLowEnd=isMobile||(navigator.hardwareConcurrency||8)<=6;
     const curve=new THREE.CatmullRomCurve3(pts);
     const ribbonGeo=new THREE.TubeGeometry(curve,isLowEnd?100:180,.05,6,false);
     const ribbonMat=new THREE.MeshBasicMaterial({color:0x8b5cf6,transparent:true,opacity:.28});

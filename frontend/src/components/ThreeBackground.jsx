@@ -11,7 +11,6 @@ export default function ThreeBackground() {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let playing = true;
     let dispose = () => {};
-    let started = false;
 
     const pauseHandlers = () => {
       const onVis = () => { playing = !document.hidden; };
@@ -129,7 +128,12 @@ export default function ThreeBackground() {
         return false;
       }
       renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
+      // half-resolution render: a quarter of the fill-rate, upscaled to
+      // full size. A subtle blur masks the softness — the scene is made of
+      // soft wireframes/particles/glows so it reads as a deliberate look.
+      renderer.setPixelRatio(isLowEnd ? 0.6 : 0.85);
+      canvas.style.filter = `blur(${isLowEnd ? 3 : 1.6}px)`;
+      canvas.style.transform = 'scale(1.06)';
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(55, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
@@ -270,43 +274,15 @@ export default function ThreeBackground() {
 
     /* ---------- boot ---------- */
     const cleanupPause = pauseHandlers();
-    let tries;
-    let fallbackTimer;
-    const boot = () => {
-      tries = setInterval(() => {
-        if (typeof THREE !== 'undefined' && !started) {
-          clearInterval(tries);
-          clearTimeout(fallbackTimer);
-          started = true;
-          let cleanup;
-          try {
-            cleanup = buildThree();
-          } catch (err) {
-            console.warn('WebGL scene failed, using fallback:', err);
-          }
-          if (cleanup) {
-            dispose = cleanup;
-          } else {
-            dispose = fallback();
-          }
-        }
-      }, 120);
-      // Guard for environments where WebGL context creation hangs — not for StrictMode
-      // re-mounts: the timer must be cleared in cleanup so a stale first-mount timer
-      // cannot swap the running WebGL scene for the fallback later.
-      fallbackTimer = setTimeout(() => {
-        if (!started) {
-          clearInterval(tries);
-          started = true;
-          dispose = fallback();
-        }
-      }, 4500);
-    };
-    boot();
+    try {
+      const cleanup = buildThree();
+      dispose = cleanup || fallback();
+    } catch (err) {
+      console.warn('WebGL scene failed, using fallback:', err);
+      dispose = fallback();
+    }
 
     return () => {
-      clearInterval(tries);
-      clearTimeout(fallbackTimer);
       cleanupPause();
       dispose();
     };
