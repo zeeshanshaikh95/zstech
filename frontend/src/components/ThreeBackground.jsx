@@ -27,6 +27,22 @@ export default function ThreeBackground() {
       };
     };
 
+    /* frame throttle: skip work when the tab is hidden, and cap the
+       render rate so weak GPUs never get starved by 2K-sized canvases.
+       Motion is time-based, so the visuals stay identical at any fps. */
+    const throttle = () => {
+      let last = performance.now();
+      const MIN_MS = 1000 / 30; // never run the scene faster than 30fps
+      return (cb) => {
+        const now = performance.now();
+        const dt = now - last;
+        if (dt < MIN_MS) return;
+        last = now;
+        cb(dt);
+      };
+    };
+    const maybeDraw = throttle();
+
     /* ---------- 2D canvas fallback ---------- */
     const fallback = () => {
       canvas.style.display = 'none';
@@ -52,42 +68,44 @@ export default function ThreeBackground() {
       let raf;
       const loop = () => {
         raf = requestAnimationFrame(loop);
-        if (!playing) return;
-        t += 0.004;
-        ctx.clearRect(0, 0, w, h);
-        for (let k = 0; k < 2; k += 1) {
-          ctx.beginPath();
-          const base = k * Math.PI;
-          for (let x = 0; x <= w; x += 8) {
-            const y = h * (0.3 + 0.25 * Math.sin(x * 0.003 + base + t * (0.8 + k * 0.3)))
-              + h * 0.25 * Math.sin(x * 0.0011 + t * 0.5 + base);
-            if (x === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
+        maybeDraw((dt) => {
+          const dtSec = Math.min(dt, 50) / 1000;
+          t += dtSec * 0.24;
+          ctx.clearRect(0, 0, w, h);
+          for (let k = 0; k < 2; k += 1) {
+            ctx.beginPath();
+            const base = k * Math.PI;
+            for (let x = 0; x <= w; x += 8) {
+              const y = h * (0.3 + 0.25 * Math.sin(x * 0.003 + base + t * (0.8 + k * 0.3)))
+                + h * 0.25 * Math.sin(x * 0.0011 + t * 0.5 + base);
+              if (x === 0) ctx.moveTo(x, y);
+              else ctx.lineTo(x, y);
+            }
+            const g = ctx.createLinearGradient(0, 0, w, 0);
+            if (k === 0) {
+              g.addColorStop(0, 'rgba(139,92,246,0)');
+              g.addColorStop(0.5, 'rgba(139,92,246,.16)');
+              g.addColorStop(1, 'rgba(56,189,248,.1)');
+            } else {
+              g.addColorStop(0, 'rgba(56,189,248,.1)');
+              g.addColorStop(0.5, 'rgba(168,85,247,.12)');
+              g.addColorStop(1, 'rgba(56,189,248,0)');
+            }
+            ctx.strokeStyle = g;
+            ctx.lineWidth = 2 + k;
+            ctx.stroke();
           }
-          const g = ctx.createLinearGradient(0, 0, w, 0);
-          if (k === 0) {
-            g.addColorStop(0, 'rgba(139,92,246,0)');
-            g.addColorStop(0.5, 'rgba(139,92,246,.16)');
-            g.addColorStop(1, 'rgba(56,189,248,.1)');
-          } else {
-            g.addColorStop(0, 'rgba(56,189,248,.1)');
-            g.addColorStop(0.5, 'rgba(168,85,247,.12)');
-            g.addColorStop(1, 'rgba(56,189,248,0)');
-          }
-          ctx.strokeStyle = g;
-          ctx.lineWidth = 2 + k;
-          ctx.stroke();
-        }
-        parts.forEach((p) => {
-          p.x += 0.0003;
-          p.y -= 0.0006 + p.z * 0.0004;
-          if (p.x > 1.02) p.x = -0.02;
-          if (p.y < -0.02) p.y = 1.02;
-          const c = cols[p.c];
-          ctx.beginPath();
-          ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${0.5 * p.z})`;
-          ctx.arc(p.x * w, p.y * h, p.r * p.z, 0, 7);
-          ctx.fill();
+          parts.forEach((p) => {
+            p.x += dtSec * 0.018;
+            p.y -= dtSec * (0.036 + p.z * 0.024);
+            if (p.x > 1.02) p.x = -0.02;
+            if (p.y < -0.02) p.y = 1.02;
+            const c = cols[p.c];
+            ctx.beginPath();
+            ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${0.5 * p.z})`;
+            ctx.arc(p.x * w, p.y * h, p.r * p.z, 0, 7);
+            ctx.fill();
+          });
         });
       };
       loop();
@@ -106,7 +124,7 @@ export default function ThreeBackground() {
         return false;
       }
       renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(55, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
@@ -211,22 +229,24 @@ export default function ThreeBackground() {
       let raf;
       const animate = () => {
         raf = requestAnimationFrame(animate);
-        if (!playing) return;
-        frame += 1;
-        group.rotation.y = Math.sin(frame * 0.0016) * 0.45;
-        group.rotation.x = Math.sin(frame * 0.001) * 0.12;
-        ico.rotation.x += 0.004;
-        ico.rotation.y += 0.006;
-        torus.rotation.x += 0.005;
-        torus.rotation.z += 0.004;
-        octa.rotation.y += 0.008;
-        camX += (mouseX - camX) * 0.04;
-        camY += (mouseY - camY) * 0.04;
-        camera.position.x = camX * 0.7;
-        camera.position.y = camY * 0.5;
-        camera.lookAt(0, 0, 0);
-        points.rotation.y += 0.0006;
-        renderer.render(scene, camera);
+        maybeDraw((dt) => {
+          const dtSec = Math.min(dt, 50) / 1000;
+          frame += dtSec * 60;
+          group.rotation.y = Math.sin(frame * 0.0016) * 0.45;
+          group.rotation.x = Math.sin(frame * 0.001) * 0.12;
+          ico.rotation.x += dtSec * 0.24;
+          ico.rotation.y += dtSec * 0.36;
+          torus.rotation.x += dtSec * 0.3;
+          torus.rotation.z += dtSec * 0.24;
+          octa.rotation.y += dtSec * 0.48;
+          camX += (mouseX - camX) * 0.04;
+          camY += (mouseY - camY) * 0.04;
+          camera.position.x = camX * 0.7;
+          camera.position.y = camY * 0.5;
+          camera.lookAt(0, 0, 0);
+          points.rotation.y += dtSec * 0.036;
+          renderer.render(scene, camera);
+        });
       };
 
       if (reduced) {

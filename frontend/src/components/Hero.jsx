@@ -65,7 +65,9 @@ export default function Hero({ words, contact }) {
   const toast = useToast();
 
   useEffect(() => {
-    const onScroll = () => {
+    let raf = 0;
+    const update = () => {
+      raf = 0;
       const hero = document.getElementById('hero');
       if (!hero) return;
       const y = window.scrollY;
@@ -78,8 +80,12 @@ export default function Hero({ words, contact }) {
         if (hintRef.current) hintRef.current.style.opacity = `${Math.max(0, 1 - y / 220)}`;
       }
     };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, []);
 
   const tel = () => toast('📞 Calling +91 98697 06442…');

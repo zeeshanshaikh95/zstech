@@ -19,12 +19,18 @@ export default function CustomCursor() {
       mx = e.clientX;
       my = e.clientY;
       dot.style.transform = `translate(${mx}px,${my}px)`;
+      if (!raf) raf = requestAnimationFrame(loop);
     };
 
     const loop = () => {
       rx += (mx - rx) * 0.16;
       ry += (my - ry) * 0.16;
       ring.style.transform = `translate(${rx}px,${ry}px)`;
+      // stop the loop once the ring settles on the cursor — restarts on the next move
+      if (Math.abs(mx - rx) < 0.5 && Math.abs(my - ry) < 0.5) {
+        raf = 0;
+        return;
+      }
       raf = requestAnimationFrame(loop);
     };
 

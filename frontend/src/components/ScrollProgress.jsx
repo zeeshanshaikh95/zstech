@@ -1,30 +1,42 @@
 import { useEffect, useRef, useState } from 'react';
 
 export default function ScrollProgress() {
-  const [progress, setProgress] = useState(0);
   const [show, setShow] = useState(false);
+  const barRef = useRef(null);
   const ringRef = useRef(null);
   const CIRC = 2 * Math.PI * 23;
 
   useEffect(() => {
-    const onScroll = () => {
+    const bar = barRef.current;
+    const ring = ringRef.current;
+    let raf = 0;
+
+    const update = () => {
+      raf = 0;
       const h = document.documentElement.scrollHeight - window.innerHeight;
       const p = h > 0 ? window.scrollY / h : 0;
-      setProgress(p);
+      // drive the DOM directly — no React re-renders per scroll tick
+      bar.style.width = `${p * 100}%`;
+      ring.style.strokeDasharray = CIRC;
+      ring.style.strokeDashoffset = CIRC - p * CIRC;
       setShow(window.scrollY > 600);
-      if (ringRef.current) {
-        ringRef.current.style.strokeDasharray = CIRC;
-        ringRef.current.style.strokeDashoffset = CIRC - p * CIRC;
-      }
     };
-    onScroll();
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    window.addEventListener('resize', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, [CIRC]);
 
   return (
     <>
-      <div id="scrollbar" aria-hidden="true" style={{ width: `${progress * 100}%` }} />
+      <div id="scrollbar" ref={barRef} aria-hidden="true" />
       <button
         id="toTop"
         className={show ? 'show' : ''}

@@ -15,15 +15,24 @@ export default function Navbar({ menuOpen, onMenuChange }) {
   const lastY = useRef(0);
 
   useEffect(() => {
-    const onScroll = () => {
+    let raf = 0;
+    const update = () => {
+      raf = 0;
       const y = window.scrollY;
-      setScrolled(y > 40);
-      setHidden(y > lastY.current && y > 500 && !menuOpen);
+      setScrolled((was) => (y > 40 ? true : was === true ? false : was));
+      setHidden((was) => {
+        const next = y > lastY.current && y > 500 && !menuOpen;
+        return next === was ? was : next;
+      });
       lastY.current = y;
     };
-    onScroll();
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    update();
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, [menuOpen]);
 
   useEffect(() => {
