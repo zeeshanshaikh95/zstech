@@ -1,9 +1,20 @@
-# ZS TECH — static site deployment for Netlify
-[build]
-  publish = "."
-  command = ""
+# ZS TECH — Netlify monorepo deployment
+# Frontend is built from /frontend; the Express API is served as a Netlify Function.
 
-# Force HTTPS redirects (default) and sensible cache headers
+[build]
+  command = "npm install && npm run build"
+  publish = "frontend/dist"
+
+[functions]
+  directory = "netlify/functions"
+
+# Route all API calls to the Express wrapper function
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+# Security headers
 [[headers]]
   for = "/*"
   [headers.values]
