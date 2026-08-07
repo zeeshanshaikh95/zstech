@@ -116,15 +116,20 @@ export default function ThreeBackground() {
     };
 
     /* ---------- WebGL scene ---------- */
+    // Device-aware quality: weaker GPUs get fewer particles and simpler
+    // geometry. The scene layout/colors/opacity are identical — only the
+    // vertex count adapts, so the visuals read the same everywhere.
+    const isMobile = window.matchMedia('(hover:none),(pointer:coarse)').matches;
+    const isLowEnd = isMobile || (navigator.hardwareConcurrency || 8) <= 6;
     const buildThree = () => {
       let renderer;
       try {
-        renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+        renderer = new THREE.WebGLRenderer({ canvas, antialias: !isLowEnd, alpha: true, powerPreference: 'high-performance' });
       } catch {
         return false;
       }
       renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(55, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
@@ -172,7 +177,7 @@ export default function ThreeBackground() {
       }
       const curve = new THREE.CatmullRomCurve3(pts);
       const ribbon = new THREE.Mesh(
-        new THREE.TubeGeometry(curve, 180, 0.05, 6, false),
+        new THREE.TubeGeometry(curve, isLowEnd ? 100 : 180, 0.05, 6, false),
         new THREE.MeshBasicMaterial({ color: 0x8b5cf6, transparent: true, opacity: 0.28 })
       );
       group.add(ribbon);
@@ -180,13 +185,13 @@ export default function ThreeBackground() {
       const ribbon2 = new THREE.Mesh(
         new THREE.TubeGeometry(
           new THREE.CatmullRomCurve3(pts.map((p, i) => new THREE.Vector3(-p.x * 0.7, (p.y - 2.2) * 0.8, -p.z))),
-          140, 0.028, 6, false
+          isLowEnd ? 80 : 140, 0.028, 6, false
         ),
         new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.2 })
       );
       group.add(ribbon2);
 
-      const N = reduced ? 240 : 640;
+      const N = reduced ? 240 : isLowEnd ? 360 : 640;
       const pos = new Float32Array(N * 3);
       const col = new Float32Array(N * 3);
       const palette = [0x8b5cf6, 0xa855f7, 0x38bdf8, 0x6366f1];
