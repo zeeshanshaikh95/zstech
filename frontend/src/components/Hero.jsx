@@ -39,9 +39,8 @@ export default function Hero() {
           </h1>
 
           <p className="hero-sub">
-            We design and build fast, custom websites for small businesses.
-            No templates, no bloat — just a site that looks sharp and brings
-            in customers.
+            We design and build fast, custom websites for small businesses — and
+            run the social media that keeps them growing. No templates, no bloat.
           </p>
 
           <div className="hero-actions">

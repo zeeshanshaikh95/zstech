@@ -11,7 +11,7 @@ export const services = [
     title: 'Custom Websites',
     description:
       'Bespoke sites tailored to your brand and goals — designed to stand out, built to convert visitors into customers.',
-    tags: ['Branding', 'UI/UX', 'Copy'],
+    tags: ['Branding', 'UI/UX'],
     icon: 'code',
   },
   {
@@ -20,7 +20,7 @@ export const services = [
     title: 'Modern & Responsive',
     description:
       'Pixel-perfect on every device — phone, tablet, desktop. Fluid layouts and smooth interactions everywhere.',
-    tags: ['Mobile-first', 'Animations', '3D'],
+    tags: ['Mobile-first', 'Animations'],
     icon: 'devices',
   },
   {
@@ -29,12 +29,46 @@ export const services = [
     title: 'Built to Grow',
     description:
       'SEO-friendly, fast and scalable from day one. A site that works hard so your business keeps compounding.',
-    tags: ['SEO', 'Speed', 'Analytics'],
+    tags: ['SEO', 'Speed'],
     icon: 'growth',
+  },
+  {
+    id: 'social-media',
+    num: '04',
+    title: 'Social Media Management',
+    description:
+      'We plan, create and post your content — reels, carousels, stories and replies — so your brand stays visible every week.',
+    tags: ['Strategy', 'Reels'],
+    icon: 'social',
   },
 ];
 
 export const projects = [
+  {
+    id: 'gbp',
+    slug: 'glow-by-parveen',
+    tag: 'Beauty Store',
+    name: 'Glow by Parveen',
+    year: '2026',
+    url: 'https://www.glowbyparveen.store/',
+    description:
+      'A soft, editorial storefront for handcrafted natural and herbal beauty — full catalogue, product pages and WhatsApp ordering.',
+    summary:
+      'A calm, editorial store for a handcrafted beauty brand — product catalogue, ingredient-led storytelling and one-tap WhatsApp ordering.',
+    tagline: 'NATURAL · HERBAL · HANDCRAFTED',
+    art: 'art-gbp',
+    features: [
+      { icon: '🛍️', title: 'Product Catalogue', detail: 'Every soap, oil and balm with photos, ingredients and benefits.' },
+      { icon: '💬', title: 'WhatsApp Ordering', detail: 'Orders land in WhatsApp with the product details already filled in.' },
+      { icon: '⭐', title: 'Reviews & Story', detail: 'Customer reviews and the maker’s story sit right in the buying flow.' },
+      { icon: '📱', title: 'Phone-First Design', detail: 'Built for the phone, where beauty customers actually shop.' },
+    ],
+    outcomes: [
+      ['Live', 'Store Status'],
+      ['100%', 'Custom Design'],
+      ['1-tap', 'WhatsApp Orders'],
+    ],
+  },
   {
     id: 'hh',
     slug: 'health-harvest',
@@ -170,6 +204,36 @@ export const heroStats = [
   { value: '2', label: 'Cities' },
 ];
 
+export const socialMedia = {
+  items: [
+    {
+      num: '01',
+      title: 'Strategy & calendar',
+      detail: 'A monthly content plan mapped to your offers, launches and season — so you are never posting for the sake of it.',
+    },
+    {
+      num: '02',
+      title: 'Content & design',
+      detail: 'Reels, carousels and stories designed to look like your brand, not a template. We handle the shooting brief, copy and edits.',
+    },
+    {
+      num: '03',
+      title: 'Posting & community',
+      detail: 'We publish on schedule, reply to comments and answer DMs — and pass every real enquiry straight to you.',
+    },
+    {
+      num: '04',
+      title: 'Monthly reporting',
+      detail: 'A clear read on reach, saves and enquiries, plus what we are changing next month. No vanity metrics.',
+    },
+  ],
+  plan: [
+    { label: 'Posts', value: '12' },
+    { label: 'Reels', value: '4' },
+    { label: 'Stories', value: '8' },
+  ],
+};
+
 export default {
   services,
   projects,
@@ -177,6 +241,7 @@ export default {
   stats,
   testimonials,
   faq,
+  socialMedia,
   marqueeItems,
   altMarqueeItems,
   typewriterWords,

@@ -21,11 +21,11 @@ frontend/
   src/
     App.jsx               page composition
     index.css             design system + all styles
-    components/           Navbar, Hero, Services, Work, FAQ, Contact…
+    components/           Navbar, Hero, Services, Work, Social, FAQ, Contact…
     hooks/useCounter.js   stat counter
     context/              toast notifications
 backend/
-  data/siteData.js        services, projects, testimonials, contact details
+  data/siteData.js        services, projects, social plans, testimonials, contact
   routes/                 GET /api/data, POST /api/contact (optional)
 ```
 

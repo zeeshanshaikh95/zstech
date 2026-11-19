@@ -1,4 +1,4 @@
-const CLIENTS = ['Health Harvest', 'Blossom AC Services', 'Employee Portfolios'];
+const CLIENTS = ['Glow by Parveen', 'Health Harvest', 'Blossom AC Services', 'Employee Portfolios'];
 
 export default function Clients() {
   return (

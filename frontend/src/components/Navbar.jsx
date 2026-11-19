@@ -4,6 +4,7 @@ export const NAV_LINKS = [
   { id: 'hero', label: 'Home' },
   { id: 'services', label: 'Services' },
   { id: 'work', label: 'Work' },
+  { id: 'social', label: 'Social' },
   { id: 'process', label: 'Process' },
   { id: 'contact', label: 'Contact' },
 ];

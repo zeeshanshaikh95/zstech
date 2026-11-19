@@ -18,7 +18,10 @@ function WorkCard({ project, onOpen, delay }) {
         <div className="work-body">
           <div className="work-meta">
             <span className="cat">{project.tag}</span>
-            <span>{project.year}</span>
+            <span className="wm-right">
+              {project.url ? <span className="live"><i />Live</span> : null}
+              <span>{project.year}</span>
+            </span>
           </div>
           <h3>{project.name}</h3>
           <p>{project.description}</p>
@@ -53,7 +56,7 @@ export default function Work({ projects, contact }) {
             </h2>
           </div>
           <p className="sec-sub">
-            Three recent builds for local businesses. Open any card for the
+            Four recent builds for local businesses. Open any card for the
             full case study.
           </p>
         </Reveal>

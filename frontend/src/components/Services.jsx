@@ -7,6 +7,14 @@ const ICONS = {
       <polyline points="8 6 2 12 8 18" />
     </svg>
   ),
+  social: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="18" cy="5" r="2.6" />
+      <circle cx="6" cy="12" r="2.6" />
+      <circle cx="18" cy="19" r="2.6" />
+      <path d="m8.4 10.8 7.2-4.2M8.4 13.2l7.2 4.2" />
+    </svg>
+  ),
   devices: (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <rect x="2" y="4" width="14" height="12" rx="2" />
@@ -31,13 +39,13 @@ export default function Services({ services }) {
           <div>
             <span className="kicker">What we do</span>
             <h2 className="sec-title">
-              Everything your website<br />
-              needs to <span className="serif">win.</span>
+              Everything your brand<br />
+              needs <span className="serif">online.</span>
             </h2>
           </div>
           <p className="sec-sub">
-            Every project is built from scratch around your brand and your
-            customers — not dropped into a template.
+            Custom websites, social media management and the strategy that
+            connects them — all built around your brand, never a template.
           </p>
         </Reveal>
 

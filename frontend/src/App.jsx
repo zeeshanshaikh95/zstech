@@ -9,6 +9,7 @@ import Hero from './components/Hero.jsx';
 import Clients from './components/Clients.jsx';
 import Services from './components/Services.jsx';
 import Work from './components/Work.jsx';
+import Social from './components/Social.jsx';
 import Process from './components/Process.jsx';
 import Stats from './components/Stats.jsx';
 import Testimonials from './components/Testimonials.jsx';
@@ -47,6 +48,7 @@ function Site() {
         <Clients />
         <Services services={siteData.services} />
         <Work projects={siteData.projects} contact={contact} />
+        <Social social={siteData.socialMedia} />
         <Process steps={siteData.processSteps} />
         <Stats stats={siteData.stats} />
         <Testimonials testimonials={siteData.testimonials} />

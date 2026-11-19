@@ -61,6 +61,7 @@ export default function Footer({ contact }) {
             <a href="#hero">Home</a>
             <a href="#services">Services</a>
             <a href="#work">Work</a>
+            <a href="#social">Social</a>
             <a href="#process">Process</a>
             <a href="#contact">Contact</a>
           </nav>

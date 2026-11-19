@@ -1,4 +1,13 @@
 const THEMES = {
+  gbp: {
+    bg: '#3b1226',
+    accent: '#f472b6',
+    glow: 'rgba(244, 114, 182, 0.18)',
+    url: 'glowbyparveen.store',
+    mark: 'GP',
+    title: 'Natural beauty, handcrafted.',
+    cta: 'Shop products',
+  },
   hh: {
     bg: '#0c3322',
     accent: '#4ade80',
