@@ -44,8 +44,18 @@ npm run preview   # preview the built site
 GitHub Pages deploys automatically on every push to `main` via
 `.github/workflows/deploy.yml` (builds `frontend/dist`).
 
-A custom domain is linked later by adding a `CNAME` file to the published
-output (or via the repository's Pages settings).
+The site is served on the custom domain **zstech.space** (see
+`frontend/public/CNAME`). DNS lives at Spaceship:
+
+| Type | Name | Value |
+| --- | --- | --- |
+| A | `@` | `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153` |
+| AAAA | `@` | `2606:50c0:8000::153`, `2606:50c0:8001::153`, `2606:50c0:8002::153`, `2606:50c0:8003::153` |
+| CNAME | `www` | `zeeshanshaikh95.github.io` |
+
+Remove the old Spaceship parking A records. In the repository, Pages →
+Custom domain is `zstech.space` with **Enforce HTTPS** enabled.
+`robots.txt` and `sitemap.xml` in `frontend/public` point at the domain.
 
 ## Notes
 
