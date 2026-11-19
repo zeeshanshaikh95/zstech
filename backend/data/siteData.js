@@ -121,7 +121,7 @@ export const stats = [
   { value: 20, suffix: '+', label: 'Projects Delivered' },
   { value: 15, suffix: '+', label: 'Happy Clients' },
   { value: 99, suffix: '%', label: 'Uptime Rate' },
-  { value: 2, suffix: '', label: 'Cities · Hyd & Mumbai' },
+  { value: 2, suffix: '', label: 'Cities Served' },
 ];
 
 export const testimonials = [
@@ -155,7 +155,7 @@ export const typewriterWords = [
 
 export const contact = {
   email: 'zstech103@gmail.com',
-  phone: '+919869706422',
+  phone: '+91 98697 06442',
   phoneRaw: '+919869706422',
   whatsapp: 'https://wa.me/919869706422',
   instagram: 'https://instagram.com/zstech10',

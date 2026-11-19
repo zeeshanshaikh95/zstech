@@ -1,87 +1,88 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-const LINKS = [
-  { id: 'hero', label: 'HOME' },
-  { id: 'services', label: 'SERVICES' },
-  { id: 'work', label: 'WORK' },
-  { id: 'process', label: 'PROCESS' },
-  { id: 'contact', label: 'CONTACT' },
+export const NAV_LINKS = [
+  { id: 'hero', label: 'Home' },
+  { id: 'services', label: 'Services' },
+  { id: 'work', label: 'Work' },
+  { id: 'process', label: 'Process' },
+  { id: 'contact', label: 'Contact' },
 ];
 
-export default function Navbar({ menuOpen, onMenuChange }) {
+export default function Navbar({ menuOpen, onToggle, onClose }) {
   const [scrolled, setScrolled] = useState(false);
-  const [hidden, setHidden] = useState(false);
   const [active, setActive] = useState('hero');
-  const lastY = useRef(0);
 
   useEffect(() => {
     let raf = 0;
     const update = () => {
       raf = 0;
-      const y = window.scrollY;
-      setScrolled((was) => (y > 40 ? true : was === true ? false : was));
-      setHidden((was) => {
-        const next = y > lastY.current && y > 500 && !menuOpen;
-        return next === was ? was : next;
-      });
-      lastY.current = y;
+      setScrolled(window.scrollY > 12);
     };
-    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
     update();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => {
       window.removeEventListener('scroll', onScroll);
       if (raf) cancelAnimationFrame(raf);
     };
-  }, [menuOpen]);
+  }, []);
 
   useEffect(() => {
+    if (typeof IntersectionObserver === 'undefined') return undefined;
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) setActive(entry.target.id);
         });
       },
-      { rootMargin: '-40% 0px -55% 0px' }
+      { rootMargin: '-45% 0px -50% 0px' }
     );
-    LINKS.forEach(({ id }) => {
+
+    NAV_LINKS.forEach(({ id }) => {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
     });
+
     return () => observer.disconnect();
   }, []);
 
   return (
-    <nav id="nav" className={`${scrolled ? 'scrolled' : ''} ${hidden ? 'hidden' : ''}`}>
+    <header className={`nav ${scrolled ? 'scrolled' : ''}`}>
       <div className="wrap nav-inner">
-        <a className="logo" id="logo" href="#hero" aria-label="ZS Tech home" onClick={() => onMenuChange(false)}>
-          <div className="logo-mark"><span>ZS</span></div>
-          <div className="logo-name"><span className="zs">ZS</span>&nbsp;<span className="tech">TECH</span></div>
+        <a className="brand" href="#hero" aria-label="ZS Tech — home" onClick={onClose}>
+          <span className="brand-mark" aria-hidden="true">ZS</span>
+          <span className="brand-name">ZS <span>Tech</span></span>
         </a>
 
-        <div className="nav-links">
-          {LINKS.map(({ id, label }) => (
-            <a key={id} href={`#${id}`} className={active === id ? 'active' : ''}>{label}</a>
+        <nav className="nav-links" aria-label="Main">
+          {NAV_LINKS.map(({ id, label }) => (
+            <a key={id} href={`#${id}`} className={active === id ? 'active' : ''}>
+              {label}
+            </a>
           ))}
-        </div>
+        </nav>
 
         <div className="nav-right">
-          <span className="status"><i />Available</span>
-          <a href="#contact" className="btn btn-primary magnetic" style={{ padding: '12px 22px', fontSize: '12.5px' }}>
-            Let's Talk
+          <a href="#contact" className="btn btn-primary">
+            Start a project
           </a>
           <button
+            type="button"
             className={`burger ${menuOpen ? 'open' : ''}`}
-            id="burger"
-            aria-label="Menu"
-            aria-controls="mmenu"
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-controls="mobile-menu"
             aria-expanded={menuOpen}
-            onClick={() => onMenuChange(!menuOpen)}
+            onClick={onToggle}
           >
-            <span /><span /><span />
+            <span />
+            <span />
+            <span />
           </button>
         </div>
       </div>
-    </nav>
+    </header>
   );
 }

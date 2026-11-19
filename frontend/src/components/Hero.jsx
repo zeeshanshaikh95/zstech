@@ -1,153 +1,89 @@
-import { Component, lazy, Suspense, useEffect, useRef } from 'react';
-import { useTypewriter } from '../hooks/useTypewriter.js';
-import { useToast } from '../context/ToastContext.jsx';
+const Check = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="m20 6-11 11-5-5" />
+  </svg>
+);
 
-// Three.js (~600kB) loads in its own async chunk — the hero and the rest of
-// the page paint immediately, and the 3D scene mounts as soon as it arrives.
-const ThreeBackground = lazy(() => import('./ThreeBackground.jsx'));
+const Arrow = () => (
+  <span className="arr" aria-hidden="true">→</span>
+);
 
-// If the chunk fails to load (offline/flaky network) the background quietly
-// stays off instead of taking the whole page down.
-class ThreeBoundary extends Component {
-  state = { failed: false };
-  static getDerivedStateFromError() { return { failed: true }; }
-  render() { return this.state.failed ? null : this.props.children; }
-}
+const CODE = [
+  <div key="1"><span className="t-c">{'// zstech.config.ts'}</span></div>,
+  <div key="2"><span className="t-k">export const</span> project <span className="t-p">=</span> {'{'}</div>,
+  <div key="3">{'  '}client<span className="t-p">:</span> <span className="t-s">"your-brand"</span><span className="t-p">,</span></div>,
+  <div key="4">{'  '}stack<span className="t-p">:</span> [<span className="t-s">"react"</span><span className="t-p">,</span> <span className="t-s">"vite"</span><span className="t-p">,</span> <span className="t-s">"css"</span>]<span className="t-p">,</span></div>,
+  <div key="5">{'  '}goals<span className="t-p">:</span> [<span className="t-s">"fast"</span><span className="t-p">,</span> <span className="t-s">"beautiful"</span><span className="t-p">,</span> <span className="t-s">"seo"</span>]<span className="t-p">,</span></div>,
+  <div key="6">{'}'}<span className="t-p">;</span></div>,
+  <div key="7">&nbsp;</div>,
+  <div key="8"><span className="t-k">export async function</span> <span className="t-f">launch</span><span className="t-p">()</span> {'{'}</div>,
+  <div key="9">{'  '}<span className="t-k">await</span> <span className="t-f">design</span><span className="t-p">(</span>project<span className="t-p">);</span>{'      '}<span className="t-c">// no templates</span></div>,
+  <div key="10">{'  '}<span className="t-k">await</span> <span className="t-f">build</span><span className="t-p">({'{'}</span> quality<span className="t-p">:</span> <span className="t-n">100</span> <span className="t-p">{'}'});</span></div>,
+  <div key="11">{'  '}<span className="t-k">return</span> <span className="t-s">"websites that work"</span><span className="t-p">;</span></div>,
+  <div key="12">{'}'}</div>,
+];
 
-function Mockups() {
+export default function Hero() {
   return (
-    <div className="mock-inner">
-        <div className="laptop">
-          <div className="lap-screen">
-            <div className="ls-top">
-              <span className="ls-logo">Z<b>S</b>&nbsp;TECH</span>
-              <span className="ls-nav">
-                <span>HOME</span><span>SERVICES</span><span>WORK</span><span>ABOUT</span>
-                <span className="pill">CONTACT</span>
-              </span>
-            </div>
-            <div className="ls-body">
-              <div className="ls-txt">
-                <div className="ls-tag">● DIGITAL SOLUTIONS</div>
-                <div className="ls-h1">EXPERIENCES THAT<br /><span className="gr">DRIVE RESULTS.</span></div>
-                <div className="ls-p">We build sleek, high-performing websites that help your business stand out and scale.</div>
-                <div className="ls-btns"><span className="ls-btn">LET'S BUILD YOURS</span><span className="ls-btn o">VIEW WORK</span></div>
-              </div>
-              <svg className="ls-wave" viewBox="0 0 150 90" fill="none">
-                <path d="M0 70 C 30 20, 60 90, 90 50 S 130 10, 150 40" stroke="url(#wg)" strokeWidth="3" strokeLinecap="round" opacity=".9" />
-                <path d="M0 85 C 35 45, 65 100, 95 70 S 135 35, 150 60" stroke="url(#wg)" strokeWidth="2" strokeLinecap="round" opacity=".5" />
-                <defs>
-                  <linearGradient id="wg" x1="0" y1="0" x2="150" y2="0" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#8b5cf6" /><stop offset="1" stopColor="#38bdf8" />
-                  </linearGradient>
-                </defs>
-              </svg>
-            </div>
-          </div>
-          <div className="lap-base" />
-        </div>
+    <section id="hero" className="hero">
+      <div className="wrap hero-grid">
+        <div className="hero-copy">
+          <span className="pill">
+            <span className="dot" aria-hidden="true" />
+            Available for new projects
+          </span>
 
-        <div className="phone">
-          <div className="ph-body">
-            <div className="ph-notch" />
-            <div className="ph-head"><div className="ph-av">Z</div><span className="ph-un">zstech10</span></div>
-            <div className="ph-card">
-              <div className="pc-l">Performance</div>
-              <div className="pc-v">99% Uptime</div>
-              <div className="ph-chart"><i /><i /><i /><i /><i /></div>
-            </div>
-            <div className="ph-h1">BOLD IDEAS.<br />POWERFUL<br />WEBSITES.</div>
-            <div className="ph-btn">START A PROJECT</div>
-          </div>
-        </div>
-
-        <div className="chip chip-1"><span className="ci">⚡</span> Fast Load Times</div>
-        <div className="chip chip-2"><span className="ci">📈</span> SEO Optimized</div>
-        <div className="chip chip-3"><span className="ci">🖥️</span> Fully Responsive</div>
-    </div>
-  );
-}
-
-export default function Hero({ words, contact }) {
-  const typed = useTypewriter(words);
-  const copyRef = useRef(null);
-  const stageRef = useRef(null);
-  const hintRef = useRef(null);
-  const toast = useToast();
-
-  useEffect(() => {
-    let raf = 0;
-    const update = () => {
-      raf = 0;
-      const hero = document.getElementById('hero');
-      if (!hero) return;
-      const y = window.scrollY;
-      if (y < hero.offsetHeight) {
-        if (copyRef.current) {
-          copyRef.current.style.transform = `translateY(${y * 0.18}px)`;
-          copyRef.current.style.opacity = `${Math.max(0, 1 - (y / hero.offsetHeight) * 1.2)}`;
-        }
-        if (stageRef.current) stageRef.current.style.transform = `translateY(${y * 0.1}px)`;
-        if (hintRef.current) hintRef.current.style.opacity = `${Math.max(0, 1 - y / 220)}`;
-      }
-    };
-    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, []);
-
-  const tel = () => toast('📞 Calling +91 98697 06442…');
-  const phoneHref = `tel:${contact?.phoneRaw ?? '+919869706422'}`;
-
-  return (
-    <section id="hero">
-      <div className="aurora aur-a" />
-      <div className="aurora aur-b" />
-      <div className="aurora aur-c" />
-      <Suspense fallback={null}>
-        <ThreeBoundary>
-          <ThreeBackground />
-        </ThreeBoundary>
-      </Suspense>
-
-      <div className="wrap hero-inner">
-        <div className="hero-copy" ref={copyRef}>
-          <span className="badge"><span className="blink" /><span>Digital Solutions · Est. Hyderabad</span></span>
           <h1 className="hero-title">
-            WE BUILD<br />
-            <span className="gr">WEBSITES</span><br />
-            THAT <span className="outline">WORK.</span>
+            Websites that<br />
+            <span className="serif">actually work.</span>
           </h1>
-          <div className="hero-typer">→ we craft <span className="type">{typed}</span><span className="caret" /></div>
+
           <p className="hero-sub">
-            Modern designs. Powerful performance. <b>Built for growth.</b> From idea to launch — we turn your
-            brand into a digital experience that converts.
+            We design and build fast, custom websites for small businesses.
+            No templates, no bloat — just a site that looks sharp and brings
+            in customers.
           </p>
-          <div className="hero-cta">
-            <a href={phoneHref} className="btn btn-primary btn-lg magnetic" onClick={tel}>LET'S BUILD YOURS <span className="ico">→</span></a>
-            <a href="#work" className="btn btn-ghost btn-lg magnetic">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
-              VIEW WORK
+
+          <div className="hero-actions">
+            <a href="#contact" className="btn btn-primary">
+              Start a project <Arrow />
+            </a>
+            <a href="#work" className="btn btn-ghost">
+              See our work
             </a>
           </div>
-          <div className="hero-meta">
-            <div className="hm-item"><span className="n">99%</span><span className="l">Uptime</span></div>
-            <div className="hm-item"><span className="n">20+</span><span className="l">Projects</span></div>
-            <div className="hm-item"><span className="n">15+</span><span className="l">Clients</span></div>
-            <div className="hm-item"><span className="n">2</span><span className="l">Cities</span></div>
+
+          <ul className="hero-points">
+            <li><Check /> No templates</li>
+            <li><Check /> 2–4 week delivery</li>
+            <li><Check /> Support after launch</li>
+          </ul>
+        </div>
+
+        <div className="code" role="img" aria-label="Code sample showing a ZS Tech project configuration">
+          <div className="code-glow" aria-hidden="true" />
+          <div className="code-bar">
+            <span className="code-dot" aria-hidden="true" />
+            <span className="code-dot" aria-hidden="true" />
+            <span className="code-dot" aria-hidden="true" />
+            <span className="code-file">zstech.config.ts</span>
+            <span className="code-branch">main</span>
+          </div>
+          <div className="code-body" aria-hidden="true">
+            <div className="code-lines">
+              {CODE.map((_, i) => <div key={i}>{i + 1}</div>)}
+            </div>
+            <div className="code-src">{CODE}</div>
+          </div>
+          <div className="code-foot">
+            <span className="ok" aria-hidden="true" />
+            <b>Build passed</b>
+            <span className="sep" aria-hidden="true" />
+            <span>1.2s</span>
+            <span className="sep" aria-hidden="true" />
+            <span>Lighthouse 100</span>
           </div>
         </div>
-
-        <div className="mock-stage" ref={stageRef}>
-          <Mockups />
-        </div>
-      </div>
-
-      <div className="scroll-hint" ref={hintRef}>
-        <span className="sh-t">Scroll</span><span className="sh-line" />
       </div>
     </section>
   );

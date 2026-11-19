@@ -11,15 +11,19 @@ export function ToastProvider({ children }) {
     setMessage(msg);
     setVisible(true);
     clearTimeout(timer.current);
-    timer.current = setTimeout(() => setVisible(false), 2600);
+    timer.current = setTimeout(() => setVisible(false), 2800);
   }, []);
 
   return (
     <ToastContext.Provider value={showToast}>
       {children}
       <div id="toast" role="status" aria-live="polite" className={visible ? 'show' : ''}>
-        <span className="tk" aria-hidden="true">✓</span>
-        <span id="toastMsg">{message}</span>
+        <span className="tk" aria-hidden="true">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m20 6-11 11-5-5" />
+          </svg>
+        </span>
+        <span>{message}</span>
       </div>
     </ToastContext.Provider>
   );

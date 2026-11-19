@@ -1,63 +1,63 @@
 import Reveal from './Reveal.jsx';
-import { useTilt } from '../hooks/useTilt.js';
-import { useToast } from '../context/ToastContext.jsx';
 
 const ICONS = {
   code: (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" />
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polyline points="16 18 22 12 16 6" />
+      <polyline points="8 6 2 12 8 18" />
     </svg>
   ),
   devices: (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="3" width="20" height="14" rx="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" />
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="2" y="4" width="14" height="12" rx="2" />
+      <path d="M6 20h6" />
+      <path d="M9 16v4" />
+      <rect x="17" y="9" width="5" height="11" rx="1.4" />
     </svg>
   ),
   growth: (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="3 17 9 11 13 15 21 7" /><polyline points="15 7 21 7 21 13" />
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polyline points="3 17 9 11 13 15 21 7" />
+      <polyline points="15 7 21 7 21 13" />
     </svg>
   ),
 };
 
-function ServiceCard({ svc, phoneHref, onCall }) {
-  const tilt = useTilt();
-  return (
-    <div className="svc tilt" ref={tilt.ref} onMouseMove={tilt.onMouseMove} onMouseLeave={tilt.onMouseLeave}>
-      <span className="svc-num">{svc.num}</span>
-      <div className="svc-ico">{ICONS[svc.icon] ?? ICONS.code}</div>
-      <h3>{svc.title}</h3>
-      <p>{svc.description}</p>
-      <div className="svc-tags">{svc.tags.map((tag) => <i key={tag}>{tag}</i>)}</div>
-      <a href={phoneHref} className="svc-arrow" onClick={onCall}>
-        START A PROJECT <span className="ar">→</span>
-      </a>
-    </div>
-  );
-}
-
-export default function Services({ services, contact }) {
-  const toast = useToast();
-  const phoneHref = `tel:${contact?.phoneRaw ?? '+919869706422'}`;
-  const onCall = () => toast('📞 Calling +91 98697 06442…');
-
+export default function Services({ services }) {
   return (
     <section id="services" className="section">
       <div className="wrap">
-        <div className="sec-head reveal up">
+        <Reveal className="sec-head sec-head--split">
           <div>
-            <span className="sec-kicker">What we do</span>
-            <h2 className="sec-title">SERVICES BUILT TO<br /><span className="gr">GROW YOUR BRAND.</span></h2>
+            <span className="kicker">What we do</span>
+            <h2 className="sec-title">
+              Everything your website<br />
+              needs to <span className="serif">win.</span>
+            </h2>
           </div>
           <p className="sec-sub">
-            Every project is crafted from scratch — no templates, no shortcuts. Just custom design and code engineered around your goals.
+            Every project is built from scratch around your brand and your
+            customers — not dropped into a template.
           </p>
-        </div>
+        </Reveal>
 
         <div className="svc-grid">
           {services.map((svc, i) => (
-            <Reveal key={svc.id} anim="up" delay={i * 100}>
-              <ServiceCard svc={svc} phoneHref={phoneHref} onCall={onCall} />
+            <Reveal key={svc.id} delay={i * 70}>
+              <article className="card svc">
+                <div className="svc-top">
+                  <span className="svc-ico">{ICONS[svc.icon] ?? ICONS.code}</span>
+                  <span className="svc-num">{svc.num}</span>
+                </div>
+                <h3>{svc.title}</h3>
+                <p>{svc.description}</p>
+                <div className="svc-tags">
+                  {svc.tags.map((tag) => <span key={tag}>{tag}</span>)}
+                </div>
+                <a href="#contact" className="textlink">
+                  Start a project <span className="arr" aria-hidden="true">→</span>
+                </a>
+              </article>
             </Reveal>
           ))}
         </div>

@@ -1,36 +1,9 @@
-import { useEffect, useRef } from 'react';
-
-export default function Reveal({ children, anim = 'up', delay = 0, className = '' }) {
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced) {
-      el.classList.add('in');
-      return;
-    }
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          el.classList.add('in');
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.14 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <div
-      ref={ref}
-      className={`reveal ${anim} ${className}`}
-      style={delay ? { transitionDelay: `${delay}ms` } : undefined}
-    >
-      {children}
-    </div>
-  );
+/**
+ * Simple layout wrapper used to group section content.
+ *
+ * Deliberately static: content is never hidden behind a scroll observer, so
+ * the page renders fully even without scrolling, in print, or in previews.
+ */
+export default function Reveal({ children, className = '' }) {
+  return <div className={`reveal ${className}`.trim()}>{children}</div>;
 }

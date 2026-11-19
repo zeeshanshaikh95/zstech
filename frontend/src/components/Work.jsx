@@ -1,20 +1,17 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import Reveal from './Reveal.jsx';
-import ProjectArt from './ProjectArt.jsx';
+import ProjectArt, { projectTheme } from './ProjectArt.jsx';
 import ProjectModal from './ProjectModal.jsx';
-import { useTilt } from '../hooks/useTilt.js';
 
-function WorkCard({ project, onOpen }) {
-  const tilt = useTilt(9);
+function WorkCard({ project, onOpen, delay }) {
+  const theme = projectTheme(project.id);
+
   return (
-    <Reveal anim="up" delay={project.delay ?? 0}>
+    <Reveal delay={delay}>
       <article
-        className="work-card tilt"
-        ref={tilt.ref}
-        onMouseMove={tilt.onMouseMove}
-        onMouseLeave={tilt.onMouseLeave}
-        tabIndex="0"
+        className="card work-card"
         role="button"
+        tabIndex={0}
         aria-label={`Open ${project.name} case study`}
         onClick={() => onOpen(project)}
         onKeyDown={(e) => {
@@ -24,24 +21,22 @@ function WorkCard({ project, onOpen }) {
           }
         }}
       >
-        <div className="wc-media">
-          <ProjectArt art={project.art} />
-          <div className="wc-overlay">
-            <span className="wco-tag">Case Study</span>
-            <span className="wco-arrow">→</span>
-          </div>
+        <div
+          className="work-media"
+          style={{ background: `radial-gradient(120% 100% at 50% 0%, ${theme.glow}, transparent 72%)` }}
+        >
+          <ProjectArt project={project} />
         </div>
-        <div className="wc-body">
-          <div className="wc-top">
-            <span className="wc-cat">{project.tag}</span>
-            <span className="wc-year">{project.year}</span>
+        <div className="work-body">
+          <div className="work-meta">
+            <span className="cat">{project.tag}</span>
+            <span>{project.year}</span>
           </div>
           <h3>{project.name}</h3>
           <p>{project.description}</p>
-          <div className="wc-links">
-            <a href="#work" onClick={(e) => { e.preventDefault(); onOpen(project); }}>CASE STUDY →</a>
-            <a className="dis">LIVE SOON</a>
-          </div>
+          <span className="textlink">
+            View case study <span className="arr" aria-hidden="true">→</span>
+          </span>
         </div>
       </article>
     </Reveal>
@@ -50,27 +45,38 @@ function WorkCard({ project, onOpen }) {
 
 export default function Work({ projects, contact }) {
   const [active, setActive] = useState(null);
-  const phoneHref = `tel:${contact?.phoneRaw ?? '+919869706422'}`;
+  const close = useCallback(() => setActive(null), []);
 
   return (
-    <section id="work" className="section" style={{ background: 'var(--bg2)', borderTop: '1px solid var(--line)' }}>
+    <section id="work" className="section section--soft">
       <div className="wrap">
-        <div className="sec-head reveal up">
+        <Reveal className="sec-head sec-head--split">
           <div>
-            <span className="sec-kicker">Selected work</span>
-            <h2 className="sec-title">PROJECTS THAT<br /><span className="gr">DELIVER REAL LEADS.</span></h2>
+            <span className="kicker">Selected work</span>
+            <h2 className="sec-title">
+              Real projects,<br />
+              <span className="serif">real results.</span>
+            </h2>
           </div>
-          <p className="sec-sub">Real client work, shipped for real businesses. Tap a card for the full case study.</p>
-        </div>
+          <p className="sec-sub">
+            Three recent builds for local businesses. Open any card for the
+            full case study.
+          </p>
+        </Reveal>
 
         <div className="work-grid">
           {projects.map((project, i) => (
-            <WorkCard key={project.id} project={{ ...project, delay: i * 120 }} onOpen={setActive} />
+            <WorkCard
+              key={project.id}
+              project={project}
+              onOpen={setActive}
+              delay={i * 70}
+            />
           ))}
         </div>
       </div>
 
-      <ProjectModal project={active} onClose={() => setActive(null)} phoneHref={phoneHref} />
+      <ProjectModal project={active} onClose={close} contact={contact} />
     </section>
   );
 }

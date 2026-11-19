@@ -1,23 +1,17 @@
-import Reveal from './Reveal.jsx';
-import { useCounter } from '../hooks/useCounter.js';
-
-function StatItem({ stat, delay }) {
-  const { ref, display } = useCounter(stat.value, stat.suffix);
-  return (
-    <Reveal anim="up" delay={delay}>
-      <div className="stat">
-        <span className="sn"><span ref={ref}>{display}</span></span>
-        <div className="sl">{stat.label}</div>
-      </div>
-    </Reveal>
-  );
-}
-
 export default function Stats({ stats }) {
   return (
-    <section id="stats">
-      <div className="wrap stats-grid">
-        {stats.map((stat, i) => <StatItem key={stat.label} stat={stat} delay={i * 80} />)}
+    <section id="stats" className="section--soft" aria-label="By the numbers">
+      <div className="wrap" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
+        <div className="stats-grid">
+          {stats.map((stat) => (
+            <div className="reveal" key={stat.label}>
+              <div className="stat">
+                <span className="sn">{stat.value}{stat.suffix}</span>
+                <span className="sl">{stat.label}</span>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

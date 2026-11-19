@@ -1,36 +1,51 @@
 import { useState } from 'react';
 import Reveal from './Reveal.jsx';
 
-export default function FAQ({ faq }) {
-  const [openIndex, setOpenIndex] = useState(null);
+export default function FAQ({ faq, contact }) {
+  const [openIndex, setOpenIndex] = useState(0);
 
   return (
-    <section className="section" style={{ background: 'var(--bg2)', borderTop: '1px solid var(--line)', paddingTop: '90px' }}>
-      <div className="wrap">
-        <div className="sec-head reveal up" style={{ justifyContent: 'center', textAlign: 'center' }}>
-          <div>
-            <span className="sec-kicker">Questions</span>
-            <h2 className="sec-title">FAQs, <span className="gr">ANSWERED.</span></h2>
-          </div>
-        </div>
+    <section className="section section--soft" aria-label="Frequently asked questions">
+      <div className="wrap faq-layout">
+        <Reveal className="faq-aside">
+          <span className="kicker">Questions</span>
+          <h2 className="sec-title">
+            Good to<br />
+            <span className="serif">know.</span>
+          </h2>
+          <p>
+            Still unsure about something? Send a message — we usually reply
+            the same day.
+          </p>
+          <a href={`https://wa.me/${(contact?.phoneRaw ?? '+919869706422').replace(/\D/g, '')}`}
+            className="btn btn-ghost" target="_blank" rel="noopener noreferrer">
+            Ask on WhatsApp
+          </a>
+        </Reveal>
 
-        <div className="faq">
+        <Reveal className="faq-list">
           {faq.map((item, i) => {
             const open = openIndex === i;
             return (
-              <Reveal key={item.q} anim="up" delay={i * 60}>
-                <div className={`faq-item ${open ? 'open' : ''}`}>
-                  <button className="faq-q" onClick={() => setOpenIndex(open ? null : i)}>
-                    {item.q} <span className="fi">+</span>
-                  </button>
-                  <div className="faq-a" style={open ? { maxHeight: '240px' } : undefined}>
+              <div key={item.q} className={`faq-item ${open ? 'open' : ''}`}>
+                <button
+                  type="button"
+                  className="faq-q"
+                  aria-expanded={open}
+                  onClick={() => setOpenIndex(open ? -1 : i)}
+                >
+                  {item.q}
+                  <span className="faq-ic" aria-hidden="true" />
+                </button>
+                <div className="faq-a">
+                  <div>
                     <p>{item.a}</p>
                   </div>
                 </div>
-              </Reveal>
+              </div>
             );
           })}
-        </div>
+        </Reveal>
       </div>
     </section>
   );
