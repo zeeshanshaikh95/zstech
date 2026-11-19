@@ -8,19 +8,7 @@ function WorkCard({ project, onOpen, delay }) {
 
   return (
     <Reveal delay={delay}>
-      <article
-        className="card work-card"
-        role="button"
-        tabIndex={0}
-        aria-label={`Open ${project.name} case study`}
-        onClick={() => onOpen(project)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            onOpen(project);
-          }
-        }}
-      >
+      <article className="card work-card">
         <div
           className="work-media"
           style={{ background: `radial-gradient(120% 100% at 50% 0%, ${theme.glow}, transparent 72%)` }}
@@ -38,6 +26,12 @@ function WorkCard({ project, onOpen, delay }) {
             View case study <span className="arr" aria-hidden="true">→</span>
           </span>
         </div>
+        <button
+          type="button"
+          className="work-open"
+          aria-label={`View ${project.name} case study`}
+          onClick={() => onOpen(project)}
+        />
       </article>
     </Reveal>
   );

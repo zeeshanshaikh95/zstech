@@ -57,7 +57,7 @@ export default function Footer({ contact }) {
           </div>
 
           <nav className="foot-col" aria-label="Footer">
-            <h4>Explore</h4>
+            <h3>Explore</h3>
             <a href="#hero">Home</a>
             <a href="#services">Services</a>
             <a href="#work">Work</a>
@@ -66,7 +66,7 @@ export default function Footer({ contact }) {
           </nav>
 
           <div className="foot-col">
-            <h4>Contact</h4>
+            <h3>Contact</h3>
             <a href={`mailto:${contact?.email ?? 'zstech103@gmail.com'}`}>{contact?.email ?? 'zstech103@gmail.com'}</a>
             <a href={`tel:${contact?.phoneRaw ?? '+919869706422'}`}>{contact?.phone ?? '+91 98697 06442'}</a>
             <a href={contact?.instagram ?? 'https://instagram.com/zstech10'} target="_blank" rel="noopener noreferrer">

@@ -59,7 +59,7 @@ export default function ProjectModal({ project, onClose, contact }) {
           <p className="mb-sub">{project.summary}</p>
 
           <div className="mb-sec">
-            <h4>What we built</h4>
+            <h3>What we built</h3>
             <div className="mb-feats">
               {project.features.map((f) => (
                 <div className="mb-feat" key={f.title}>
@@ -74,7 +74,7 @@ export default function ProjectModal({ project, onClose, contact }) {
           </div>
 
           <div className="mb-sec">
-            <h4>Outcomes</h4>
+            <h3>Outcomes</h3>
             <div className="mb-out">
               {project.outcomes.map(([metric, label]) => (
                 <div className="mo" key={label}>

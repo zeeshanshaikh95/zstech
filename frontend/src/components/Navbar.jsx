@@ -52,7 +52,7 @@ export default function Navbar({ menuOpen, onToggle, onClose }) {
   return (
     <header className={`nav ${scrolled ? 'scrolled' : ''}`}>
       <div className="wrap nav-inner">
-        <a className="brand" href="#hero" aria-label="ZS Tech — home" onClick={onClose}>
+        <a className="brand" href="#hero" onClick={onClose}>
           <span className="brand-mark" aria-hidden="true">ZS</span>
           <span className="brand-name">ZS <span>Tech</span></span>
         </a>
